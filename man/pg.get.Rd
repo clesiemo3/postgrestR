@@ -15,7 +15,8 @@ pg.get(domain, table, select = "", filter = "", limit = "",
 \item{domain}{The root of the PostgREST server. E.g.
 https://postgrest.herokuapp.com}
 
-\item{table}{The table you are querying}
+\item{table}{The table you are querying. Can be an empty string ("") for
+default root table listing.}
 
 \item{select}{Character vector or comma separated string of columns to return
 (optional)}
@@ -24,6 +25,14 @@ https://postgrest.herokuapp.com}
 expressions in R syntax or PostgREST syntax when pg.filter.syntax == TRUE.}
 
 \item{limit}{Integer limiting the number of records returned from the API.}
+
+\item{pg.filter.syntax}{Boolean indicating whether your filter expression is
+in PostgREST filter syntax or not. Defaults to FALSE using R expressions.}
+
+\item{encoding}{Character passed to \link[httr]{content}. Defaults to UTF-8}
+
+\item{...}{Extra parameters passed to \link[httr]{GET}. e.g. config =
+add_headers(custom_header="hello world")}
 }
 \value{
 data.frame of your response
@@ -32,7 +41,8 @@ data.frame of your response
 RESTful GET for PostgREST resources.
 }
 \examples{
-pg.get("https://postgrest.herokuapp.com", "speakers", limit = 5, filter = c("id >= 228", "featured == TRUE")))
+pg.get("https://postgrest.herokuapp.com",
+	"speakers", limit = 5, filter = c("id >= 228", "featured == TRUE"))
 
 }
 

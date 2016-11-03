@@ -4,15 +4,23 @@
 #' @aliases pg.get pg.GET pgGET pgget postgrest.get
 #' @param domain The root of the PostgREST server. E.g.
 #'   https://postgrest.herokuapp.com
-#' @param table The table you are querying
+#' @param table The table you are querying. Can be an empty string ("") for
+#'   default root table listing.
 #' @param select Character vector or comma separated string of columns to return
 #'   (optional)
 #' @param filter Character vector or comma separated string of filter
 #'   expressions in R syntax or PostgREST syntax when pg.filter.syntax == TRUE.
 #' @param limit Integer limiting the number of records returned from the API.
+#' @param pg.filter.syntax Boolean indicating whether your filter expression is
+#'   in PostgREST filter syntax or not. Defaults to FALSE using R expressions.
+#' @param encoding Character passed to \link[httr]{content}. Defaults to UTF-8
+#' @param ... Extra parameters passed to \link[httr]{GET}. e.g. config =
+#'   add_headers(custom_header="hello world")
 #' @return data.frame of your response
 #' @examples
-#' pg.get("https://postgrest.herokuapp.com", "speakers", limit = 5, filter = c("id >= 228", "featured == TRUE")))
+#' pg.get("https://postgrest.herokuapp.com",
+#' 	"speakers", limit = 5,
+#' 	filter = c("id >= 228", "featured == TRUE"))
 #'
 
 pg.get <- function(domain,
