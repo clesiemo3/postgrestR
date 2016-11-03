@@ -1,0 +1,9 @@
+Package: postgrestR
+Type: Package
+Title: PostgREST for R
+Version: 0.1.0
+Authors@R: person("James", "Moore", email = "james.moore@clesiemo3.com", role = c("aut", "cre"))
+Description: More about what it does (maybe more than one line).
+License: MIT
+LazyData: TRUE
+RoxygenNote: 5.0.1
