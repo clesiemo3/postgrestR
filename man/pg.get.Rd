@@ -41,8 +41,22 @@ data.frame of your response
 RESTful GET for PostgREST resources.
 }
 \examples{
-pg.get("https://postgrest.herokuapp.com",
-	"speakers", limit = 5, filter = c("id >= 228", "featured == TRUE"))
+domain <- "https://postgrest.herokuapp.com"
+
+pg.get(domain, "speakers", limit = 5,
+	filter = c("id >= 228", "featured == TRUE"))
+
+pg.get(domain, "speakers", filter = "id=eq.228",
+	pg.filter.syntax = TRUE)
+
+# All of the below give the same result
+pg.get(domain, "speakers", filter = "id in (228,161)")
+pg.get(domain, "speakers", filter = "id \%in\% (228,161)")
+pg.get(domain, "speakers", filter = "id in c(228,161)")
+pg.get(domain, "speakers", filter = "id \%in\% c(228,161)")
+
+# View table list
+pg.get(domain, "")
 
 }
 

@@ -18,9 +18,22 @@
 #'   add_headers(custom_header="hello world")
 #' @return data.frame of your response
 #' @examples
-#' pg.get("https://postgrest.herokuapp.com",
-#' 	"speakers", limit = 5,
+#' domain <- "https://postgrest.herokuapp.com"
+#'
+#' pg.get(domain, "speakers", limit = 5,
 #' 	filter = c("id >= 228", "featured == TRUE"))
+#'
+#' pg.get(domain, "speakers", filter = "id=eq.228",
+#' 	pg.filter.syntax = TRUE)
+#'
+#' # All of the below give the same result
+#' pg.get(domain, "speakers", filter = "id in (228,161)")
+#' pg.get(domain, "speakers", filter = "id %in% (228,161)")
+#' pg.get(domain, "speakers", filter = "id in c(228,161)")
+#' pg.get(domain, "speakers", filter = "id %in% c(228,161)")
+#'
+#' # View table list
+#' pg.get(domain, "")
 #'
 
 pg.get <- function(domain,
@@ -38,20 +51,22 @@ pg.get <- function(domain,
 
 	## filter ##
 	if(length(filter) == 1){
-		filter <- unlist(strsplit(filter, ","))
+		# negative lookahead to only split on commas not inside parens
+		filter <- unlist(strsplit(filter, ",(?![^\\(]*\\))", perl=TRUE))
 	}
 
 	if(pg.filter.syntax){
 		filter.exp <- filter
 	} else {
 		filter.exp <- filter
-		filter.exp <- gsub(" ", "",filter.exp)
+		filter.exp <- gsub("( |c*\\(|\\))", "",filter.exp)
 		filter.exp <- gsub(">=","=gte.",filter.exp)
 		filter.exp <- gsub("<=","=lte.",filter.exp)
 		filter.exp <- gsub(">", "=gt.",filter.exp)
 		filter.exp <- gsub("<", "=lt.",filter.exp)
 		filter.exp <- gsub("==","=eq.",filter.exp)
 		filter.exp <- gsub("!=","=neq.",filter.exp)
+		filter.exp <- gsub("%*in%*","=in.",filter.exp)
 	}
 
 	filter <- paste(filter.exp, collapse = "&")
@@ -77,7 +92,8 @@ pg.get <- function(domain,
 	} else if(grepl("csv", r$headers$`content-type`)){
 		dat <- utils::read.csv(text = r.content)
 	} else {
-		warning(paste(r$headers$`content-type`, "is not supported. Returning response."))
+		warning(paste(r$headers$`content-type`,
+					  "is not supported. Returning response object."))
 		return(r)
 	}
 
