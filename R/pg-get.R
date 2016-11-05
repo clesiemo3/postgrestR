@@ -4,12 +4,12 @@ filter.convert <- function(filter, pg.filter.syntax){
 	} else {
 		filter.exp <- filter
 		filter.exp <- gsub("( |c*\\(|\\))", "",filter.exp)
-		filter.exp <- gsub(">=","=gte.",filter.exp)
-		filter.exp <- gsub("<=","=lte.",filter.exp)
-		filter.exp <- gsub(">", "=gt.",filter.exp)
-		filter.exp <- gsub("<", "=lt.",filter.exp)
-		filter.exp <- gsub("==","=eq.",filter.exp)
-		filter.exp <- gsub("!=","=neq.",filter.exp)
+		filter.exp <- gsub(">=","=gte.",filter.exp, fixed = TRUE)
+		filter.exp <- gsub("<=","=lte.",filter.exp, fixed = TRUE)
+		filter.exp <- gsub(">", "=gt.",filter.exp, fixed = TRUE)
+		filter.exp <- gsub("<", "=lt.",filter.exp, fixed = TRUE)
+		filter.exp <- gsub("==","=eq.",filter.exp, fixed = TRUE)
+		filter.exp <- gsub("!=","=neq.",filter.exp, fixed = TRUE)
 		filter.exp <- gsub("%*in%*","=in.",filter.exp)
 	}
 
@@ -31,6 +31,9 @@ filter.convert <- function(filter, pg.filter.syntax){
 #' @param filter Character vector or comma separated string of filter
 #'   expressions in R syntax or PostgREST syntax when pg.filter.syntax == TRUE.
 #' @param limit Integer limiting the number of records returned from the API.
+#' @param order Character vector or comma separated string of columns to sort
+#'   by. Ascending by default, otherwise wrap the column in desc() to sort by
+#'   descending.
 #' @param pg.filter.syntax Boolean indicating whether your filter expression is
 #'   in PostgREST filter syntax or not. Defaults to FALSE using R expressions.
 #' @param url.only Boolean when TRUE returns the URL built and does not call the
@@ -63,11 +66,12 @@ filter.convert <- function(filter, pg.filter.syntax){
 #' 	url.only = TRUE)
 #'
 
-pg.get <- function(domain,
-				   table,
+pg.get <- function(domain = "https://postgrest.herokuapp.com",
+				   table = "",
 				   select = "",
 				   filter = "",
 				   limit = "",
+				   order = "",
 				   pg.filter.syntax = FALSE,
 				   url.only = FALSE,
 				   encoding = "UTF-8",
@@ -94,9 +98,16 @@ pg.get <- function(domain,
 		limit <- paste0("limit=", limit)
 	}
 
+	## order ##
+	if(length(order)>1){
+		order <- paste(order, collapse = ",")
+	}
+
+	order <- gsub("(desc\\()(.+)\\)", "\\2.desc", order)
+
 	## url build ##
 	base.url <- paste0(domain, "/", table, "?")
-	url <- paste(base.url, select, filter, limit, sep = "&")
+	url <- paste(base.url, select, filter, order, limit, sep = "&")
 	url <- gsub("(\\n|\\t|\\r)", "", url)
 
 	if(url.only){

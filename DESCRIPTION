@@ -3,7 +3,7 @@ Type: Package
 Title: PostgREST for R
 Version: 0.1.0
 Authors@R: person("James", "Moore", email = "james.moore@clesiemo3.com", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line).
+Description: Provides an R interface to PostgREST apis. R syntax is converted into PostgREST syntax to allow API interaction for R Users without learning a new set of syntax.
 Imports: httr, jsonlite
 License: MIT + file LICENSE
 LazyData: TRUE

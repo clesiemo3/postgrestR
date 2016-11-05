@@ -8,7 +8,8 @@
 \alias{postgrest.get}
 \title{PostgREST GET}
 \usage{
-pg.get(domain, table, select = "", filter = "", limit = "",
+pg.get(domain = "https://postgrest.herokuapp.com", table = "",
+  select = "", filter = "", limit = "", order = "",
   pg.filter.syntax = FALSE, url.only = FALSE, encoding = "UTF-8", ...)
 }
 \arguments{
@@ -25,6 +26,10 @@ default root table listing.}
 expressions in R syntax or PostgREST syntax when pg.filter.syntax == TRUE.}
 
 \item{limit}{Integer limiting the number of records returned from the API.}
+
+\item{order}{Character vector or comma separated string of columns to sort
+by. Ascending by default, otherwise wrap the column in desc() to sort by
+descending.}
 
 \item{pg.filter.syntax}{Boolean indicating whether your filter expression is
 in PostgREST filter syntax or not. Defaults to FALSE using R expressions.}
