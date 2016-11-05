@@ -1,3 +1,23 @@
+filter.convert <- function(filter, pg.filter.syntax){
+	if(pg.filter.syntax){
+		filter.exp <- filter
+	} else {
+		filter.exp <- filter
+		filter.exp <- gsub("( |c*\\(|\\))", "",filter.exp)
+		filter.exp <- gsub(">=","=gte.",filter.exp)
+		filter.exp <- gsub("<=","=lte.",filter.exp)
+		filter.exp <- gsub(">", "=gt.",filter.exp)
+		filter.exp <- gsub("<", "=lt.",filter.exp)
+		filter.exp <- gsub("==","=eq.",filter.exp)
+		filter.exp <- gsub("!=","=neq.",filter.exp)
+		filter.exp <- gsub("%*in%*","=in.",filter.exp)
+	}
+
+	filter <- paste(filter.exp, collapse = "&")
+	return(filter)
+}
+
+
 #' @export
 #' @title PostgREST GET
 #' @description RESTful GET for PostgREST resources.
@@ -13,6 +33,8 @@
 #' @param limit Integer limiting the number of records returned from the API.
 #' @param pg.filter.syntax Boolean indicating whether your filter expression is
 #'   in PostgREST filter syntax or not. Defaults to FALSE using R expressions.
+#' @param url.only Boolean when TRUE returns the URL built and does not call the
+#'   API. Useful for debugging purposes. Defaults to FALSE.
 #' @param encoding Character passed to \link[httr]{content}. Defaults to UTF-8
 #' @param ... Extra parameters passed to \link[httr]{GET}. e.g. config =
 #'   add_headers(custom_header="hello world")
@@ -35,6 +57,11 @@
 #' # View table list
 #' pg.get(domain, "")
 #'
+#' # View the URL that will be called for debugging purposes
+#' pg.get(domain, "speakers", select = "id,name,bio",
+#' 	limit = 2, filter = "id in (228,161),featured == TRUE",
+#' 	url.only = TRUE)
+#'
 
 pg.get <- function(domain,
 				   table,
@@ -42,6 +69,7 @@ pg.get <- function(domain,
 				   filter = "",
 				   limit = "",
 				   pg.filter.syntax = FALSE,
+				   url.only = FALSE,
 				   encoding = "UTF-8",
 				   ...) {
 	## select ##
@@ -55,21 +83,7 @@ pg.get <- function(domain,
 		filter <- unlist(strsplit(filter, ",(?![^\\(]*\\))", perl=TRUE))
 	}
 
-	if(pg.filter.syntax){
-		filter.exp <- filter
-	} else {
-		filter.exp <- filter
-		filter.exp <- gsub("( |c*\\(|\\))", "",filter.exp)
-		filter.exp <- gsub(">=","=gte.",filter.exp)
-		filter.exp <- gsub("<=","=lte.",filter.exp)
-		filter.exp <- gsub(">", "=gt.",filter.exp)
-		filter.exp <- gsub("<", "=lt.",filter.exp)
-		filter.exp <- gsub("==","=eq.",filter.exp)
-		filter.exp <- gsub("!=","=neq.",filter.exp)
-		filter.exp <- gsub("%*in%*","=in.",filter.exp)
-	}
-
-	filter <- paste(filter.exp, collapse = "&")
+	filter <- filter.convert(filter, pg.filter.syntax)
 
 	## limit ##
 	if(!limit==""){
@@ -83,6 +97,12 @@ pg.get <- function(domain,
 	## url build ##
 	base.url <- paste0(domain, "/", table, "?")
 	url <- paste(base.url, select, filter, limit, sep = "&")
+	url <- gsub("(\\n|\\t|\\r)", "", url)
+
+	if(url.only){
+		return(url)
+	}
+
 	r <- httr::GET(url, ...)
 	r.content <- httr::content(r, "text", encoding = encoding)
 

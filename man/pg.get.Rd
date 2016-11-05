@@ -9,7 +9,7 @@
 \title{PostgREST GET}
 \usage{
 pg.get(domain, table, select = "", filter = "", limit = "",
-  pg.filter.syntax = FALSE, encoding = "UTF-8", ...)
+  pg.filter.syntax = FALSE, url.only = FALSE, encoding = "UTF-8", ...)
 }
 \arguments{
 \item{domain}{The root of the PostgREST server. E.g.
@@ -28,6 +28,9 @@ expressions in R syntax or PostgREST syntax when pg.filter.syntax == TRUE.}
 
 \item{pg.filter.syntax}{Boolean indicating whether your filter expression is
 in PostgREST filter syntax or not. Defaults to FALSE using R expressions.}
+
+\item{url.only}{Boolean when TRUE returns the URL built and does not call the
+API. Useful for debugging purposes. Defaults to FALSE.}
 
 \item{encoding}{Character passed to \link[httr]{content}. Defaults to UTF-8}
 
@@ -57,6 +60,11 @@ pg.get(domain, "speakers", filter = "id \%in\% c(228,161)")
 
 # View table list
 pg.get(domain, "")
+
+# View the URL that will be called for debugging purposes
+pg.get(domain, "speakers", select = "id,name,bio",
+	limit = 2, filter = "id in (228,161),featured == TRUE",
+	url.only = TRUE)
 
 }
 
