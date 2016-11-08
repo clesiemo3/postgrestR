@@ -80,6 +80,7 @@ pg.get <- function(domain = "https://postgrest.herokuapp.com",
 	if(length(select) > 1){
 		select <- paste(select, collapse = ",")
 	}
+	select <- paste0("select=", select)
 
 	## filter ##
 	if(length(filter) == 1){
@@ -104,6 +105,7 @@ pg.get <- function(domain = "https://postgrest.herokuapp.com",
 	}
 
 	order <- gsub("(desc\\()(.+)\\)", "\\2.desc", order)
+	order <- paste0("order=", order)
 
 	## url build ##
 	base.url <- paste0(domain, "/", table, "?")
