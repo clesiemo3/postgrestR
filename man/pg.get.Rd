@@ -64,7 +64,7 @@ pg.get(domain, "speakers", filter = "id in c(228,161)")
 pg.get(domain, "speakers", filter = "id \%in\% c(228,161)")
 
 # View table list
-pg.get(domain, "")
+pg.get(domain)
 
 # View the URL that will be called for debugging purposes
 pg.get(domain, "speakers", select = "id,name,bio",
