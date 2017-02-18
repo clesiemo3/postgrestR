@@ -58,7 +58,7 @@ filter.convert <- function(filter, pg.filter.syntax){
 #' pg.get(domain, "speakers", filter = "id %in% c(228,161)")
 #'
 #' # View table list
-#' pg.get(domain, "")
+#' pg.get(domain)
 #'
 #' # View the URL that will be called for debugging purposes
 #' pg.get(domain, "speakers", select = "id,name,bio",
@@ -102,10 +102,9 @@ pg.get <- function(domain = "https://postgrest.herokuapp.com",
 	## order ##
 	if(length(order)>1){
 		order <- paste(order, collapse = ",")
+		order <- gsub("(desc\\()(.+)\\)", "\\2.desc", order)
+		order <- paste0("order=", order)
 	}
-
-	order <- gsub("(desc\\()(.+)\\)", "\\2.desc", order)
-	order <- paste0("order=", order)
 
 	## url build ##
 	base.url <- paste0(domain, "/", table, "?")
